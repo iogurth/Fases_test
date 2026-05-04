@@ -4,36 +4,23 @@ import pickle
 from tqdm import tqdm
 import os
 
-os.chdir("../../../../../../home/iogurth/gdrive/TNG300_MergerTrees")
+os.chdir("../TNG_SUBLINK_300-1")
 
 # -------------------------------
 # CONFIGURACIÓN
 # -------------------------------
-phase1_file = "dataset_fases/phase1_structural.h5"       # archivo existente
-output_file = "dataset_fases/phase2_few_features.h5"    # archivo nuevo
-state_file = "dataset_fases/phase2_state.pkl"            # estado de avance
+phase1_file = "../DATASET/phase1_structural.h5"       # archivo existente
+output_file = "../DATASET/phase2_few_features.h5"    # archivo nuevo
+state_file = "../DATASET/phase2_state.pkl"            # estado de avance
 tree_files = [f"tree_extended.{i}.hdf5" for i in range(125)]  # rango total de archivos
 
 # Campos físicos a agregar
 feature_fields = [
-    #"Mass", "SubhaloMassType", "SubhaloVmax", "SubhaloVelDisp", "SubhaloSpin",
-    #"SubhaloHalfmassRad", "SubhaloPos", "SubhaloVel",
-    #"Group_M_Crit200", "Group_M_Crit500", "Group_M_Mean200",
-    #"SubhaloMass", "SnapNum", "SubhaloID"
-    #"SubhaloWindMass", "SubhaloStarMetallicity", "SubhaloBHMass", "SubhaloGasMetalFractions"
-    #"GroupBHMass", "GroupBHMdot", "GroupVel", "GroupWindMass"
+    "GroupPos", "SubhaloVel", "GroupVel", "Mass", "SubhaloPos", "Group_M_Crit200", "Group_M_Crit500",
+    "Group_M_Mean200", "Group_R_Crit200", "SnapNum", "SubhaloMass", "SubhaloPos", "SubhaloHalfmassRad",
+    "SubhaloSpin", "SubhaloVelDisp",
 
-
-    #"SubhaloWindMass", "SubhaloStarMetallicity", "SubhaloBHMass", "SubhaloGasMetalFractions"
-    #"GroupBHMass", "GroupBHMdot", "GroupWindMass"
-
-
-    #"SubhaloMassType", "SnapNum", "FirstProgenitorID", "NextProgenitorID", "Group_M_Crit200", 
-    #"Group_R_Crit200", "SubhaloHalfmassRad", "SubhaloVelDisp",
-    #"SubhaloID", "SubhaloVmax", "SubhaloSpin", "Group_M_Crit500", "Group_M_Mean200",
-    #"GroupPos", "SubhaloVel", "GroupVel", "Mass", "SubhaloPos"
-
-    "SubhaloBHMass", "SubhaloGasMetallicity", "SubhaloSFR", "SubhaloSFRinRad"
+    "SubhaloMassType", "SubhaloBHMass", "SubhaloGasMetallicity", "SubhaloSFR", "SubhaloSFRinRad"
 ]
 
 # -------------------------------
@@ -51,10 +38,10 @@ if os.path.exists(state_file):
 with h5py.File(phase1_file, "r") as f_in, h5py.File(output_file, "a") as f_out:
     
     # Copiar datasets de la estructura si es la primera vez
-    #if "TreeID" not in f_out:
-    #    for name in f_in.keys():
-    #        f_in.copy(name, f_out)
-    #    print("Copiada estructura base al nuevo archivo.")
+    if "TreeID" not in f_out:
+        for name in f_in.keys():
+            f_in.copy(name, f_out)
+        print("Copiada estructura base al nuevo archivo.")
 
     # Crear grupos para features si no existen
     if "Features" not in f_out:

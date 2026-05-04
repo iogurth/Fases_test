@@ -15,12 +15,12 @@ import torch
 from tqdm import tqdm
 import os
 
-os.chdir("../../../../../../home/iogurth/gdrive/TNG300_MergerTrees")
+os.chdir("../TNG_SUBLINK_300-1")
 
 # --------- Ajustes / paths ----------
-INPUT_PKL = "dataset_fases/dataset_phase3_mangrove_like_all_targets_FULLRAW_FIX_extra_info.pkl"
-OUTPUT_PKL = "dataset_fases/dataset_phase4_reduced_mangrove_like.pkl"
-STATE_FILE = "dataset_fases/state_phase4.json"
+INPUT_PKL = "../DATASET/dataset_phase3.pkl"
+OUTPUT_PKL = "../DATASET/dataset_phase4_reduced_mangrove_like.pkl"
+STATE_FILE = "../DATASET/state_phase4.json"
 
 # límites y parámetros
 MAX_NODES_PER_TREE = 20000     # si el árbol reducido > esto -> lo descartamos (igual que paper)

@@ -2,20 +2,23 @@
 import pickle
 import random
 from tqdm import tqdm
+import os
 
-input_pkl  = "dataset_phase6_normX.pkl"
+os.chdir("../TNG_SUBLINK_300-1")
 
-train_out  = "dataset_fases_train.pkl"
-val_out    = "dataset_fases_val.pkl"
-test_out   = "dataset_fases_test.pkl"
+input_pkl  = "../DATASET/dataset_phase6_normX.pkl"
+
+train_out  = "../DATASET/final/dataset_fases_train.pkl"
+val_out    = "../DATASET/final/dataset_fases_val.pkl"
+test_out   = "../DATASET/final/dataset_fases_test.pkl"
 
 # proporciones (ajusta a gusto)
-train_frac = 0.80
-val_frac   = 0.10
-test_frac  = 0.10
+train_frac = 0.70
+val_frac   = 0.15
+test_frac  = 0.15
 
 # semilla para reproducibilidad
-RANDOM_SEED = 1234
+RANDOM_SEED = 666
 random.seed(RANDOM_SEED)
 
 def stream_load_graphs(path):

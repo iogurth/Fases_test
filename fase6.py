@@ -4,13 +4,13 @@ import torch
 import numpy as np
 import os
 
-os.chdir("../../../../../../home/iogurth/gdrive/TNG300_MergerTrees")
+os.chdir("../TNG_SUBLINK_300-1")
 
-input_pkl  = "dataset_fases/dataset_phase5_logY.pkl"
-output_pkl = "dataset_fases/dataset_phase6_normX.pkl"
-stats_out  = "dataset_fases/phase6_norm_stats.npz"
+input_pkl  = "../DATASET/dataset_phase5_logY.pkl"
+output_pkl = "../DATASET/dataset_phase6_normX.pkl"
+stats_out  = "../DATASET/phase6_norm_stats.npz"
 
-SNAP_COL = 13   # <- tu columna SnapNum
+SNAP_COL = 11   # <- tu columna SnapNum
 
 def stream_graphs(path):
     """Generador que lee grafos uno por uno desde un PKL grande."""

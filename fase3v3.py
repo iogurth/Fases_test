@@ -10,17 +10,19 @@ import re
 import json
 
 # ====== Ajusta rutas según tu entorno ======
-os.chdir("../../../../../../home/iogurth/gdrive/TNG300_MergerTrees")
+os.chdir("../TNG_SUBLINK_300-1")
 
-input_file = "dataset_fases/phase2_few_features.h5"
-output_file = "dataset_fases/dataset_phase3_mangrove_like_all_targets_FULLRAW_FIX_extra_info.pkl"
-state_file = "dataset_fases/state_phase3_thresholds.json"
+
+input_file = "../DATASET/phase2_few_features.h5"
+output_file = "../DATASET/dataset_phase3.pkl"
+state_file = "../DATASET/state_phase3_thresholds.json"
 
 # ====== Hiperparámetros (EDITA AQUÍ) ======
 # Unidad: SubhaloMassType[:,4] en tu phase2 está en [1e10 Msun/h]
-mass_cut = 0.0        # umbral para la raíz (smass) usado en selección de centrals
+mass_halo_cut = 0.6774 
 mass_node_cut = 0.0  # umbral mínimo para nodos individuales (smass)
 min_nodes = 15         # guardar solo árboles con >= min_nodes
+MIN_SFR = 1e-8
 
 # Thresholds por target (las claves deben corresponder al orden de 'y' que usas)
 # En este script la y = [smass, mcold, mbh, zcold, sfrinst, sfravg]
@@ -34,7 +36,7 @@ target_thresholds = {
 }
 
 # general_target_threshold = None  -> usa target_thresholds individuales
-general_target_threshold = 0.0  # ejemplo: 0.0
+general_target_threshold = None  # ejemplo: 0.0
 
 # Si require_any=True guarda el árbol si al menos 1 target supera su umbral.
 # Si require_any=False guarda solo si TODOS los targets superan su umbral.
@@ -151,8 +153,8 @@ def build_tree(root_sid, subid_to_idx, FirstProg_local, NextProg_local, Desc_loc
         float(mcold_local[root_local_idx]),
         float(mbh_local[root_local_idx]),
         float(zcold_local[root_local_idx]),
-        float(sfrinst_local[root_local_idx]),
-        float(sfravg_local[root_local_idx])
+        max(float(sfrinst_local[root_local_idx]), MIN_SFR),
+        max(float(sfravg_local[root_local_idx]), MIN_SFR)
     ], dtype=torch.float32)
 
     # =====================
@@ -205,11 +207,12 @@ def build_tree(root_sid, subid_to_idx, FirstProg_local, NextProg_local, Desc_loc
 
 # ====== MAIN ======
 def main():
-    if not os.path.exists("dataset_fases"):
-        os.makedirs("dataset_fases")
+    #if not os.path.exists("dataset_fases"):
+    #    os.makedirs("dataset_fases")
 
     with h5py.File(input_file, "r") as f:
         # enumerar y ordenar grupos
+        
         groups = [k for k in f.keys() if k.startswith("tree_extended.")]
         groups = sorted(groups, key=extract_number)
         if test_mode:
@@ -238,9 +241,8 @@ def main():
                 count_graphs = int(st.get("count", 0))
             print(f"Reanudando desde grupo #{done_idx}, grafos previos: {count_graphs}")
 
-        # keys para features por nodo (ajusta según quieras)
+        # keys para features por nodo
         node_feature_keys = [
-            "Concentration", #,)
             "GroupPos", #, 3)
             "GroupVel", #, 3)
             "Group_M_Crit200", #,)
@@ -248,16 +250,14 @@ def main():
             "Group_M_Mean200", #,)
             "Group_R_Crit200", #,)
             "Mass", #,)
-            "Rs", #,)
-            "SnapNum", 
-            "SpinBullock",
-            "SubhaloHalfmass",
-            #"SubhaloID",
+            "SnapNum",
+            "SubhaloHalfmassRad",
             "SubhaloMass",
             "SubhaloPos",
             "SubhaloSpin",
             "SubhaloVel",
-            "SubhaloVelDisp"
+            "SubhaloVelDisp",
+
         ]
 
         with open(output_file, "ab") as fout:
@@ -288,6 +288,8 @@ def main():
                 sfrinst_slice = safe_get_feature(f["Features"], "SubhaloSFR", start, end)
                 sfravg_slice = safe_get_feature(f["Features"], "SubhaloSFRinRad", start, end)
 
+                halo_mass_slice = safe_get_feature(f["Features"], "Group_M_Mean200", start, end)
+
                 # arrays topológicos locales
                 TreeID = grp["TreeID"][:]
                 SubhaloID = grp["SubhaloID"][:]
@@ -306,7 +308,8 @@ def main():
                     mask = TreeID == tid
                     local_indices = np.where(mask)[0]
                     latest_local = local_indices[np.argmax(SnapNum_local[local_indices])]
-                    if smass_slice[latest_local] >= mass_cut:
+
+                    if halo_mass_slice[latest_local] >= mass_halo_cut:
                         centrals_idx.append(int(latest_local))
 
                 print(f"{gname}: {len(centrals_idx)} centrals detectados (start={start:,})")
@@ -322,8 +325,8 @@ def main():
                         "mcold": float(mcold_slice[local_idx]),
                         "mbh": float(mbh_slice[local_idx]) if mbh_slice is not None else 0.0,
                         "zcold": float(zcold_slice[local_idx]) if zcold_slice is not None else 0.0,
-                        "sfrinst": float(sfrinst_slice[local_idx]) if sfrinst_slice is not None else 0.0,
-                        "sfravg": float(sfravg_slice[local_idx]) if sfravg_slice is not None else 0.0
+                        "sfrinst": max(float(sfrinst_slice[local_idx]) if sfrinst_slice is not None else 0.0, MIN_SFR),
+                        "sfravg": max(float(sfravg_slice[local_idx]) if sfravg_slice is not None else 0.0, MIN_SFR)
                     }
 
                     # decide si guarda (según thresholds)

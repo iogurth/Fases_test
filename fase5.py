@@ -4,11 +4,11 @@ import torch
 from tqdm import tqdm
 import os
 
-os.chdir("../../../../../../home/iogurth/gdrive/TNG300_MergerTrees")
+os.chdir("../TNG_SUBLINK_300-1")
 
 
-input_pkl  = "dataset_fases/dataset_phase4_reduced_mangrove_like.pkl"
-output_pkl = "dataset_fases/dataset_phase5_logY.pkl"
+input_pkl  = "../DATASET/dataset_phase4_reduced_mangrove_like.pkl"
+output_pkl = "../DATASET/dataset_phase5_logY.pkl"
 
 def load_graphs_streaming(path):
     """Iterador que lee muchos pickles consecutivos de un archivo."""

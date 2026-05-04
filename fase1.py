@@ -4,13 +4,13 @@ from tqdm import tqdm
 import os
 
 
-os.chdir("../../../../../../home/iogurth/gdrive/TNG300_MergerTrees")
+os.chdir("../TNG_SUBLINK_300-1")
 
 
-# Archivos de entrada (puedes ajustarlo)
+# Archivos de entrada
 files = [f"tree_extended.{i}.hdf5" for i in range(125)]
-output_file = "dataset_fases/phase1_structural.h5"
-index_file = "dataset_fases/phase1_state.txt"
+output_file = "../DATASET/phase1_structural.h5"
+index_file = "../DATASET/phase1_state.txt"
 
 # Campos estructurales que definen la jerarquía
 structure_fields = [
